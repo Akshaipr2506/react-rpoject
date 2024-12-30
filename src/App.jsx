@@ -19,7 +19,7 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/project' element={<Project/>}/>
         <Route path='/login' element={<Auth/>}/>
-        <Route path='/register' element={<Auth/>}/>
+        <Route path='/register' element={<Auth register={true}/>}/>
         <Route path='/dashboard' element={<Dashboard/>}/>
         <Route path='*' element={<Pagentfound/>}/>
       </Routes>

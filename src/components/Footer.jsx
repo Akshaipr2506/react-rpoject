@@ -7,7 +7,7 @@ import { faLinkedin } from '@fortawesome/free-brands-svg-icons/faLinkedin'
 function Footer() {
   return (
     <>
-        <div className='w-full bg-success container-fluid p-5'>
+        <div className='w-full bg-success container-fluid p-5 mt-5'>
             <div className="row">
                 <div className="col-md-4">
                     <h2 className='text-white'> <FontAwesomeIcon className='me-3' icon={faStackOverflow} />Project Fair</h2>
