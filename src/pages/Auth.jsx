@@ -2,7 +2,7 @@ import { faStackOverflow } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { requestApi } from '../service/allApi'
+import { loginApi, requestApi } from '../service/allApi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -43,6 +43,37 @@ function Auth({register}) {
       
     }
   }
+
+  const handleLogin= async ()=>{
+    const {email,password}=userDetails
+    if(!email || !password){
+      toast.info('fill the form completely')
+    }
+    else{
+      const result= await loginApi({email,password})
+      console.log(result);
+      if(result.status==200){
+        toast.success('login successfull')
+        sessionStorage.setItem("existingUsers",JSON.stringify(result.data.existingUsers))
+        sessionStorage.setItem("token",result.data.token)
+
+        setUserDetails({
+          email:"",
+          password:""
+        })
+        setTimeout(()=>{
+          navigate("/")
+        },2000)
+        
+      }
+      else if(result.status==406){
+        toast.error(result.response.status)
+      }
+      else{
+        toast.error("Something went wrong")
+      }
+    }
+  }
   
 
   return (
@@ -79,7 +110,7 @@ function Auth({register}) {
                   </div>
                   
                   {!register? <div>
-                    <button className='btn btn-warning form-control rounded-0 mt-2'>Login</button>
+                    <button className='btn btn-warning form-control rounded-0 mt-2' onClick={handleLogin}>Login</button>
                     <p className='mt-4 text-light'>New User? Click Here to <Link  to={'/register'} className='text-danger text-decoration-none'>Register</Link></p>
                   </div>
                     :

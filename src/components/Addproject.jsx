@@ -1,12 +1,86 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import { toast, ToastContainer } from 'react-toastify';
+import { addProject, addProjectApi } from '../service/allApi';
 
 function Addproject() {
 
     const [show, setShow] = useState(false);
+    const [preview,setPreview]=useState("")
+    const [token,setToken]=useState("")
+    console.log(token);
+    
 
-    const handleClose = () => setShow(false);
+    const [projectDetails,setProjectDetails]=useState({
+        title:"",
+        language:"",
+        github:"",
+        website:"",
+        overview:"",
+        projectImage:""
+    })
+    console.log(projectDetails);
+    const handleFile=(e)=>{
+        //console.log(e.target.files[0]);
+        setProjectDetails({...projectDetails,projectImage:e.target.files[0]})
+    }
+    useEffect(()=>{
+        if(projectDetails.projectImage){
+           setPreview(URL.createObjectURL(projectDetails.projectImage)) 
+        }
+    },[projectDetails.projectImage])
+
+    const handleCancel=()=>{
+        setProjectDetails({
+            title:"",
+            language:"",
+            github:"",
+            website:"",
+            overview:"",
+            projectImage:""
+        })
+        setPreview("")
+    }
+
+    const handleAdd=async()=>{
+        const{title,language,github,website,overview,projectImage}=projectDetails
+        if(!title||!language||!github||!website||!overview||!projectImage){
+            toast.info('please fill the form completly')
+        }else{
+            const reqBody = new FormData()
+            reqBody.append("title",title)
+            reqBody.append("language",language)
+            reqBody.append("github",github)
+            reqBody.append("website",website)
+            reqBody.append("overview",overview)
+            reqBody.append("projectImage",projectImage)
+
+            if(token){
+                const reqHeader={
+                    "COntent-Type":"multipart/form-data",
+                    "Authorization":`Bearer/${token}`
+                }
+                const result= await addProjectApi(reqBody,reqHeader)
+                console.log(result);
+
+                
+            }else{
+                toast.warning('please login')
+            }
+        }
+    }
+    useEffect(()=>{
+        if(sessionStorage.getItem('token')){
+            setToken(sessionStorage.getItem('token'))
+        }
+    },[])
+    
+
+    const handleClose = () => {
+        setShow(false)
+        handleCancel()
+    };
     const handleShow = () => setShow(true);
     return (
         <>
@@ -23,39 +97,40 @@ function Addproject() {
                         <div className="row">
                             <div className="col-md-6">
                                 <label htmlFor="projectimage">
-                                    <input type="file" id='projectimage' className='d-none' />
-                                    <img src="https://img.freepik.com/free-vector/image-upload-concept-illustration_114360-996.jpg" alt="" className='w-100' />
+                                    <input type="file" id='projectimage' className='d-none'  onChange={(e)=>handleFile(e)}/>
+                                    <img src={preview? preview:"https://img.freepik.com/free-vector/image-upload-concept-illustration_114360-996.jpg"} alt="" className='w-100' />
                                 </label>
                             </div>
                             <div className="col-md-6">
                                 <div>
-                                    <input type="text" placeholder='Title'  className='form-control mt-3'/>
+                                    <input type="text" placeholder='Title' value={projectDetails.title}  className='form-control mt-3' onChange={(e)=>setProjectDetails({...projectDetails,title:e.target.value})}/>
                                 </div>
                                 <div>
-                                    <input type="text" placeholder='Language'  className='form-control mt-3 '/>
+                                    <input type="text" placeholder='Language'  value={projectDetails.language} onChange={(e)=>setProjectDetails({...projectDetails,language:e.target.value})}  className='form-control mt-3 '/>
                                 </div>
                                 <div>
-                                    <input type="text" placeholder='Github'  className='form-control mt-3'/>
+                                    <input type="text" placeholder='Github'  value={projectDetails.github} onChange={(e)=>setProjectDetails({...projectDetails,github:e.target.value})}  className='form-control mt-3'/>
                                 </div>
                                 <div>
-                                    <input type="text" placeholder='Website'  className='form-control mt-3'/>
+                                    <input type="text" placeholder='Website'  value={projectDetails.website} onChange={(e)=>setProjectDetails({...projectDetails,website:e.target.value})}  className='form-control mt-3'/>
                                 </div>
                                 <div>
-                                    <textarea rows={5} placeholder='Overview' className='form-control mt-3'></textarea>
+                                    <textarea rows={5} placeholder='Overview'  value={projectDetails.overview} onChange={(e)=>setProjectDetails({...projectDetails,overview:e.target.value})} className='form-control mt-3'></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="warning" onClick={handleClose}>
+                    <Button variant="warning" onClick={handleCancel}>
                         Cancel
                     </Button>
-                    <Button variant="success" onClick={handleClose}>
+                    <Button variant="success" onClick={handleAdd}>
                        Add Project
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <ToastContainer position='top-center' autoClose={2000} theme="colored"/>
         </>
     )
 }

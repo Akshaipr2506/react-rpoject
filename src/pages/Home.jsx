@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import photo from '../assets/photo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
@@ -9,6 +9,17 @@ import ProductCard from '../components/ProductCard'
 
 
 function Home() {
+  const [isLogin,setIsLogin] =useState(false)
+
+  useEffect(()=>{
+    if(sessionStorage.getItem("token")){
+      setIsLogin(true)
+    }
+    else{
+      setIsLogin(false)
+    }
+  })
+  
   return (
     <>
       <div className='p-5 bg-success' style={{ height: '100vh' }}>
@@ -17,8 +28,11 @@ function Home() {
             <div className="col-md-6">
               <h1 className='text-light' style={{ fontSize: '50px' }}>Project Fair</h1>
               <p>One stop destination for all software development projects</p>
-              <Link to={'/login'}><button className='btn text-light p-1 mt-3'>Get Started  <FontAwesomeIcon icon={faArrowRight} style={{ color: "#ffffff", }} /></button></Link>
-              <Link to={'/project'}><button className='btn text-light p-1 mt-3'>Manage Project  <FontAwesomeIcon icon={faArrowRight} style={{ color: "#ffffff", }} /></button></Link>
+
+              {isLogin ==false? <Link to={'/login'}><button className='btn text-light p-1 mt-3'>Get Started  <FontAwesomeIcon icon={faArrowRight} style={{ color: "#ffffff", }} /></button></Link>
+              :
+              <Link to={'/dashboard'}><button className='btn text-light p-1 mt-3'>Manage Project  <FontAwesomeIcon icon={faArrowRight} style={{ color: "#ffffff", }} /></button></Link>}
+
             </div>
             <div className="col-md-6 mt-4">
               <img className='w-100 p-3' src={photo} alt="" />
@@ -43,4 +57,4 @@ function Home() {
   )
 }
 
-export default Home
+export default Home 
