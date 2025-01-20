@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { toast, ToastContainer } from 'react-toastify';
-import { addProject, addProjectApi } from '../service/allApi';
+import 'react-toastify/dist/ReactToastify.css';
+import {addProjectApi } from '../service/allApi';
+import { addResponseContext } from '../context/ContextShare';
 
 function Addproject() {
 
+    const {setAddResponse}=useContext(addResponseContext)
     const [show, setShow] = useState(false);
     const [preview,setPreview]=useState("")
     const [token,setToken]=useState("")
     console.log(token);
+    const [key,setKey]=useState(1)
     
 
     const [projectDetails,setProjectDetails]=useState({
@@ -41,6 +45,12 @@ function Addproject() {
             projectImage:""
         })
         setPreview("")
+        if(key==1){
+            setKey(0)
+        }
+        else{
+            setKey(1)
+        }
     }
 
     const handleAdd=async()=>{
@@ -59,10 +69,26 @@ function Addproject() {
             if(token){
                 const reqHeader={
                     "COntent-Type":"multipart/form-data",
-                    "Authorization":`Bearer/${token}`
+                    "Authorization":`Bearer ${token}`
                 }
                 const result= await addProjectApi(reqBody,reqHeader)
                 console.log(result);
+                if(result.status ==200){
+                    toast.success('project added successfully')
+                    setTimeout(()=>{
+                        handleClose()
+                    },2000)
+                    setAddResponse(result)
+                }
+                else if(result.status==406){
+                        toast.warning(result.response.data)
+                        handleCancel
+                    }
+                
+                else{
+                    toast.error('something went wrong')
+                    handleClose()
+                }
 
                 
             }else{
@@ -97,7 +123,7 @@ function Addproject() {
                         <div className="row">
                             <div className="col-md-6">
                                 <label htmlFor="projectimage">
-                                    <input type="file" id='projectimage' className='d-none'  onChange={(e)=>handleFile(e)}/>
+                                    <input type="file" id='projectimage' className='d-none' key={key}  onChange={(e)=>handleFile(e)}/>
                                     <img src={preview? preview:"https://img.freepik.com/free-vector/image-upload-concept-illustration_114360-996.jpg"} alt="" className='w-100' />
                                 </label>
                             </div>

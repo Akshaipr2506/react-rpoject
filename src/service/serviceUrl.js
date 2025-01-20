@@ -1,1 +1,1 @@
-export const serverUrl="http://localhost:4040"
+export const serverUrl="https://projectfair-server-t4fa.onrender.com"

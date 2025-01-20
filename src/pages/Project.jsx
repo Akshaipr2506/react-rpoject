@@ -1,22 +1,55 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import ProductCard from '../components/ProductCard'
 import { Link } from 'react-router-dom'
+import { getAllProjectApi } from '../service/allApi'
+import Footer from '../components/Footer'
+
 
 
 
 
 function Project() {
+
+  const [token, setToken] = useState("")
+  const [allProject, setAllProject] = useState([])
+  const [searchKey, setSearchKey] = useState("")
+  console.log(searchKey);
+
+  const getAllProject = async () => {
+    if (sessionStorage.getItem("token")) {
+      setToken(sessionStorage.getItem('token'))
+            const reqHeader = {
+        "COntent-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}`
+      }
+      const result = await getAllProjectApi(searchKey,reqHeader)
+      console.log(result.data);
+      setAllProject(result.data)
+
+    }
+  }
+  useEffect(()=>{
+    getAllProject();
+  },[searchKey])
+
+  useEffect(() => {
+    getAllProject()
+    if (sessionStorage.getItem("token")) {
+      setToken(sessionStorage.getItem('token'))
+    }
+  },[token])
+
   return (
     <>
-      
+
       <div>
-        <Header/>
+        <Header />
         <h1 className='mt-4 text-center'>All Projects</h1>
-        {/* not login */}
-        <div className='mt-5'>
+
+        {!token ? <div className='mt-5'>
           <div className='container-fluid'>
             <div className="row">
               <div className="col-md-3"></div>
@@ -31,30 +64,35 @@ function Project() {
         </div>
 
 
-        {/* logged in */}
-        <div className='mt-5'>
-          <div className='container'>
-            <div className="row">
-              <div className="col-md-4"></div>
-              <div className="col-md-4 d-flex">
-                <input type="text" placeholder='Technologies' className='shadow form-control' />
-                <FontAwesomeIcon style={{color:'lightgrey',marginTop:'10px',marginLeft:'-30px'}} icon={faMagnifyingGlass} />
+          :
+          <div>
+            <div className='mt-5'>
+              <div className='container'>
+                <div className="row">
+                  <div className="col-md-4"></div>
+                  <div className="col-md-4 d-flex">
+                    <input type="text"onChange={(e)=>setSearchKey(e.target.value)} placeholder='Technologies' className='shadow form-control' />
+                    <FontAwesomeIcon style={{ color: 'lightgrey', marginTop: '10px', marginLeft: '-30px' }} icon={faMagnifyingGlass} />
+                  </div>
+                  <div className="col-md-4"></div>
+                </div>
               </div>
-              <div className="col-md-4"></div>
+
+            </div>
+
+            <div className='container mt-5 p-1'>
+              <div className="row ">
+                {allProject?.map((item)=>(
+                  <div className="col-md-3 mb-5"><ProductCard project={item} /></div>
+                ))
+                }
+              </div>
             </div>
           </div>
+        }
 
-        </div>
-
-        <div className='container mt-5 p-1'>
-          <div className="row">
-            <div className="col-md-3"><ProductCard/></div>
-            <div className="col-md-3"><ProductCard/></div>
-            <div className="col-md-3"><ProductCard/></div>
-            <div className="col-md-3"><ProductCard/></div>
-          </div>
-        </div>
       </div>
+      <Footer/>
     </>
   )
 }

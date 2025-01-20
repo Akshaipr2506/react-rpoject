@@ -1,14 +1,16 @@
 import { faStackOverflow } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginApi, requestApi } from '../service/allApi'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { loginResponseContext } from '../context/ContextShare'
 
 function Auth({register}) {
 
   const navigate=useNavigate()
+  const {setLoginResponse}=useContext(loginResponseContext)
 
   const [userDetails,setUserDetails]=useState({
     username:"",
@@ -54,6 +56,7 @@ function Auth({register}) {
       console.log(result);
       if(result.status==200){
         toast.success('login successfull')
+        setLoginResponse(true)
         sessionStorage.setItem("existingUsers",JSON.stringify(result.data.existingUsers))
         sessionStorage.setItem("token",result.data.token)
 

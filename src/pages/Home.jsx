@@ -4,21 +4,34 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom'
 import ProductCard from '../components/ProductCard'
+import { getHomeProjectApi } from '../service/allApi'
+import Footer from '../components/Footer'
 
 
 
 
 function Home() {
   const [isLogin,setIsLogin] =useState(false)
+  const [homeProject,setHomeProject]=useState([])
+
+  const getHomeProject=async ()=>{
+    const result=await getHomeProjectApi()
+    console.log(result);
+    setHomeProject(result.data)
+    
+  }
+  console.log(homeProject);
+  
 
   useEffect(()=>{
+    getHomeProject()
     if(sessionStorage.getItem("token")){
       setIsLogin(true)
     }
     else{
       setIsLogin(false)
     }
-  })
+  },[])
   
   return (
     <>
@@ -45,14 +58,20 @@ function Home() {
       <div>
         <h1 className='text-center mt-5'>Explore Our Project</h1>
         <div className='container mt-5'>
-          <div className="row">
-            <div className="col-md-4"><ProductCard/></div>
-            <div className="col-md-4"><ProductCard/></div>
-            <div className="col-md-4"><ProductCard/></div>
+        <div className="row ">
+          {
+            homeProject?.map((item)=>(
+             
+                <div className="col-md-4"><ProductCard project={item}/></div>
+              
+            ))
+          }
           </div>
+          
         </div>
         <Link className='text-decoration-none' to={'/project'}><p className='text-center text-warning mt-5'>See more projetcs.....</p></Link>
       </div>
+      <Footer/>
     </>
   )
 }

@@ -1,12 +1,29 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStackOverflow } from '@fortawesome/free-brands-svg-icons';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
+import { loginResponseContext } from '../context/ContextShare';
+
 
 function Header() {
+    const [token, setToken]=useState("")
+    const navigate =useNavigate()
+    const {setLoginResponse}=useContext(loginResponseContext)
+    useEffect(()=>{
+        if(sessionStorage.getItem("token")){
+            setToken(sessionStorage.getItem("token"))
+        }
+    },[])
+    const handleLogout=()=>{
+        sessionStorage.removeItem("existingUsers")
+        sessionStorage.removeItem("token")
+        navigate('/')
+        setLoginResponse(false)
+
+    }
     return (
         <>
             <div>
@@ -15,7 +32,7 @@ function Header() {
                         <Navbar.Brand>
                             <Link to={'/'} className='text-decoration-none'> <span className='text-light fs-3'><FontAwesomeIcon icon={faStackOverflow} size="xl" style={{color: "#ffffff",}} className='me-4' />Project Fair</span></Link>
                         </Navbar.Brand>
-                        <Link><button className='btn btn-warning rounded'><FontAwesomeIcon icon={faPowerOff} className='me-2' />Logout</button> </Link>
+                        {token && <button onClick={handleLogout} className='btn btn-warning rounded'><FontAwesomeIcon icon={faPowerOff} className='me-2' />Logout</button>}
                     </Container>
                 </Navbar>
             </div>

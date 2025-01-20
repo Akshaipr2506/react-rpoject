@@ -7,23 +7,26 @@ import Dashboard from './pages/Dashboard'
 import Auth from './pages/Auth'
 import Pagentfound from './pages/Pagentfound'
 import Footer from './components/Footer'
+import { useContext } from 'react'
+import { loginResponseContext } from './context/ContextShare'
 
 
 
 function App() {
+  const {loginResponse}=useContext(loginResponseContext)
   
 
   return (
     <>
       <Routes>
         <Route path='/' element={<Home/>}/>
-        <Route path='/project' element={<Project/>}/>
+        <Route path='/project' element={loginResponse?<Project/>: <Pagentfound/>}/>
         <Route path='/login' element={<Auth/>}/>
         <Route path='/register' element={<Auth register={true}/>}/>
-        <Route path='/dashboard' element={<Dashboard/>}/>
+        <Route path='/dashboard' element={loginResponse?<Dashboard/>: <Pagentfound/>}/>
         <Route path='*' element={<Pagentfound/>}/>
       </Routes>
-      <Footer/>
+      
     </>
   )
 }
